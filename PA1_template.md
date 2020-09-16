@@ -1,5 +1,7 @@
 ---
 title: "Reproducible Research: Peer Assessment 1"
+subtitle: "This is an R Markdown document for peer assessment 1 of Coursera's Reproducible Research course."
+author: "Carlos Hernandez"
 output: 
   html_document:
     keep_md: true
@@ -13,6 +15,7 @@ First unzip and read the data into `data`
 
 ```r
 invisible(Sys.setlocale("LC_ALL","English"))
+
 unzip("./activity.zip")
 data <- read.csv("./activity.csv")
 ```
@@ -51,9 +54,10 @@ summary(data)
 # Add needed packages
 library(dplyr)
 library(ggplot2)
+library(scales)
 
 # colors pallete
-colors.pallete <- c(
+colors.pallete.1 <- c(
   "#011f4b",
   "#03396c",
   "#005b96",
@@ -61,6 +65,15 @@ colors.pallete <- c(
   "#b3cde0",
   "#cccccc",
   "#8c8c8c")
+
+colors.pallete.2 <- c(
+  "#03232b",
+  "#053742",
+  "#064a5a",
+  "#085e72",
+  "#0a728a",
+  "#0b85a2",
+  "#0d99b9")
 ```
 
 ## What is mean total number of steps taken per day?
@@ -68,7 +81,7 @@ colors.pallete <- c(
 
 ```r
 # grouping by date (sum steps for each day) 
-data_by_day <- data %>% group_by(date) %>% summarise(total_steps = sum(steps))
+data_by_day <- data %>% group_by(date) %>% summarise(total_steps = sum(steps , na.rm = TRUE))
 # add a weekday column
 data_by_day$Weekday = weekdays(as.Date(data_by_day$date))
 # calculate the mean and median of total steps
@@ -79,7 +92,7 @@ data_steps_median <- median(data_by_day$total_steps, na.rm = TRUE)
 ggplot(data = data_by_day, aes(y=total_steps, x= date, fill = Weekday)) +  
   geom_col() + 
   theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 8, face = "bold"), legend.position = "top", panel.background = element_rect(fill = '#f1f1f1', colour = 'white')) + 
-  scale_fill_manual(values = colors.pallete) +
+  scale_fill_manual(values = colors.pallete.1) +
   ggtitle(label = "Total Steps by Day") +
   ylab("Total Steps") +
   xlab("Day") +
@@ -103,7 +116,7 @@ max_avg_interval <- total_steps_by_interval[total_steps_by_interval$avg_steps ==
 
 # make plot
 ggplot(total_steps_by_interval, aes(x = interval, y = avg_steps)) +
-  geom_line(colour=colors.pallete[1]) +
+  geom_line(colour=colors.pallete.1[1]) +
   ggtitle(label = "Average daily activity pattern by Interval") +
   ylab("Average of steps") +
   xlab("Interval") +
@@ -156,7 +169,7 @@ Now we can make the histogram with the new values
 # grouping by date (sum steps for each day)
 data_filling_by_day <- data_filling %>% group_by(date) %>% summarise(total_steps = sum(steps))
 # add weekday column
-data_filling_by_day$Weekday = weekdays(as.Date(data_by_day$date))
+data_filling_by_day$Weekday = weekdays(as.Date(data_filling_by_day$date))
 # calculate the mean and median for total_steps
 data_filling_mean <- mean(data_filling_by_day$total_steps)
 data_filling_median <- median(data_filling_by_day$total_steps)
@@ -165,7 +178,7 @@ data_filling_median <- median(data_filling_by_day$total_steps)
 ggplot(data = data_filling_by_day, aes(y=total_steps, x= date, fill = Weekday)) +  
   geom_col() + 
   theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 8, face = "bold"), legend.position = "top", panel.background = element_rect(fill = '#f1f1f1', colour = 'white')) + 
-  scale_fill_manual(values = colors.pallete) +
+  scale_fill_manual(values = colors.pallete.2) +
   ggtitle(label = "Total Steps by Day (after missing values are imputed)") +
   ylab("Total Steps") +
   xlab("Day") +
@@ -192,6 +205,7 @@ parse.day <- function(date){
     return("Weekday")
   }
 }
+
 # applying the day_type function
 data$day_type = sapply(data$date, parse.day)
 # grouping by interval and date and summarize steps applying the mean
@@ -205,7 +219,7 @@ ggplot(data_by_interval, aes(x = interval, y = avg_steps, col = day_type)) +
   ggtitle("Activity patterns between weekdays and weekends") +
   theme(legend.position = "none")  +
   ylab("Average of steps") +
-  xlab("Interval")
+  xlab("Interval") 
 ```
 
 ![](PA1_template_files/figure-html/unnamed-chunk-10-1.png)<!-- -->
