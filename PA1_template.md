@@ -10,23 +10,44 @@ output:
 
 First unzip and read the data into `data`
 
-```{r warning=FALSE, error=FALSE, message = FALSE}
-invisible(Sys.setlocale("LC_ALL","English"))
 
+```r
+invisible(Sys.setlocale("LC_ALL","English"))
 unzip("./activity.zip")
 data <- read.csv("./activity.csv")
 ```
 
 A quick view of the data structure
 
-```{r}
+
+```r
 str(data)
 ```
-```{r}
+
+```
+## 'data.frame':	17568 obs. of  3 variables:
+##  $ steps   : int  NA NA NA NA NA NA NA NA NA NA ...
+##  $ date    : chr  "2012-10-01" "2012-10-01" "2012-10-01" "2012-10-01" ...
+##  $ interval: int  0 5 10 15 20 25 30 35 40 45 ...
+```
+
+```r
 summary(data)
 ```
 
-```{r message=FALSE} 
+```
+##      steps            date              interval     
+##  Min.   :  0.00   Length:17568       Min.   :   0.0  
+##  1st Qu.:  0.00   Class :character   1st Qu.: 588.8  
+##  Median :  0.00   Mode  :character   Median :1177.5  
+##  Mean   : 37.38                      Mean   :1177.5  
+##  3rd Qu.: 12.00                      3rd Qu.:1766.2  
+##  Max.   :806.00                      Max.   :2355.0  
+##  NA's   :2304
+```
+
+
+```r
 # Add needed packages
 library(dplyr)
 library(ggplot2)
@@ -44,7 +65,8 @@ colors.pallete <- c(
 
 ## What is mean total number of steps taken per day?
 
-```{r message=FALSE, warning=FALSE, fig.width=11, fig.height= 8}
+
+```r
 # grouping by date (sum steps for each day) 
 data_by_day <- data %>% group_by(date) %>% summarise(total_steps = sum(steps))
 # add a weekday column
@@ -66,12 +88,14 @@ ggplot(data = data_by_day, aes(y=total_steps, x= date, fill = Weekday)) +
   geom_hline(yintercept= data_steps_median, linetype="solid", color = "blue", size=1) +
   annotate(geom="text", x=8, y=22200, label=paste("Median =", round(data_steps_median, 2)), color="blue")+
   geom_text(aes(x = date, y = total_steps, label = total_steps, angle  = 90, size = 2, hjust = -0.1), color = "#5ea5dd", show.legend = FALSE) 
-
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-5-1.png)<!-- -->
 
 ## What is the average daily activity pattern?
 
-```{r message=FALSE,warning=FALSE, fig.width=11, fig.height= 7}
+
+```r
 # grouping by interval
 total_steps_by_interval <- data %>% group_by(interval) %>% summarise(avg_steps = mean(steps, na.rm=TRUE))
 # get the maximum avg
@@ -88,24 +112,25 @@ ggplot(total_steps_by_interval, aes(x = interval, y = avg_steps)) +
    annotate(geom="text", y=190, x= max_avg_interval$interval + 300, label= paste("Interval = ", round(max_avg_interval$interval ,2)), color="red") +
   geom_segment(aes(x = max_avg_interval$interval + 500, y = max_avg_interval$avg_steps + 10, xend = max_avg_interval$interval, yend = max_avg_interval$avg_steps),
                   arrow = arrow(length = unit(0.5, "cm")))
-
-
-
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-6-1.png)<!-- -->
 
 ## Imputing missing values
 
 First we will calculate the number of NA values
 
-```{r}
+
+```r
 na_cases <- sapply(data$steps, is.na)
 na_values <- data$steps[na_cases]
 ```
-*NA values in the data set:*  `r length(na_values)`
+*NA values in the data set:*  2304
 
 In this step, our strategy for input missing values will be take the mean for that 5 minutes interval and assign it to the missing value
 
-```{r message=FALSE}
+
+```r
 # grouping the data by interval and summarize steps applying mean 
 interval_avg <- data %>% group_by(interval) %>% summarise(steps = mean(steps, na.rm=TRUE))
 
@@ -126,7 +151,8 @@ data_filling$steps = mapply(fill_missing, data$steps, data$interval)
 
 Now we can make the histogram with the new values
 
-```{r message=FALSE, , warning=FALSE, fig.width=11, fig.height= 8}
+
+```r
 # grouping by date (sum steps for each day)
 data_filling_by_day <- data_filling %>% group_by(date) %>% summarise(total_steps = sum(steps))
 # add weekday column
@@ -148,15 +174,14 @@ ggplot(data = data_filling_by_day, aes(y=total_steps, x= date, fill = Weekday)) 
   geom_hline(yintercept= data_filling_median, linetype="solid", color = "blue", size=1) +
   annotate(geom="text", x=8, y=22200, label=paste("Median =", round(data_filling_median, 2)), color="blue")+
   geom_text(aes(x = date, y = total_steps, label = round(total_steps,0), angle  = 90, size = 2, hjust = -0.1), color = "#5ea5dd", show.legend = FALSE) 
-
-
-
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-9-1.png)<!-- -->
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
-```{r message=FALSE,, error=FALSE, fig.width=11, fig.height= 8}
 
+```r
 #' this function classify the date in weekend or weekday 
 #' @param date a date value
 parse.day <- function(date){
@@ -181,8 +206,9 @@ ggplot(data_by_interval, aes(x = interval, y = avg_steps, col = day_type)) +
   theme(legend.position = "none")  +
   ylab("Average of steps") +
   xlab("Interval")
-
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-10-1.png)<!-- -->
 
 
 
