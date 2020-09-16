@@ -1,4 +1,4 @@
-#Reproducible Research: Peer Assessment 1"
+# Reproducible Research: Peer Assessment 1"
 This is an R Markdown document for peer assessment 1 of Coursera's Reproducible Research course.
 *Carlos Hernández*
 
