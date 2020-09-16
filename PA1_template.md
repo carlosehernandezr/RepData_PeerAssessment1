@@ -1,12 +1,6 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-subtitle: "This is an R Markdown document for peer assessment 1 of Coursera's Reproducible Research course."
-author: "Carlos Hernandez"
-output: 
-  html_document:
-    keep_md: true
----
-
+#Reproducible Research: Peer Assessment 1"
+## This is an R Markdown document for peer assessment 1 of Coursera's Reproducible Research course.
+###### Carlos Hernandez
 
 ## Loading and preprocessing the data
 
